@@ -18,11 +18,11 @@ export default function CheckupSheet({
   const [selected, setSelected] = useState('');
 
   function handleConfirm() {
-    if (!selected) return;
+    if (selected === '') return;
 
     onConfirm(selected);
-    onClose();
     setSelected('');
+    onClose();
   }
 
   function handleClose() {
@@ -38,12 +38,16 @@ export default function CheckupSheet({
       onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
+
+        {/* Fondo oscuro detrás de la hoja */}
         <Pressable
           style={styles.backdrop}
           onPress={handleClose}
         />
 
+        {/* Hoja de selección */}
         <View style={styles.sheet}>
+
           <View style={styles.handle} />
 
           <Text style={styles.title}>
@@ -54,20 +58,24 @@ export default function CheckupSheet({
             Elige el día que prefieras
           </Text>
 
+          {/* Días seleccionables */}
           <View style={styles.days}>
             {days.map((day) => (
               <Pressable
                 key={day}
+                onPress={() => {
+                  setSelected(day);
+                  console.log('Día seleccionado:', day);
+                }}
                 style={[
                   styles.chip,
-                  day === selected && styles.chipSelected,
+                  selected === day && styles.chipSelected,
                 ]}
-                onPress={() => setSelected(day)}
               >
                 <Text
                   style={[
                     styles.chipText,
-                    day === selected && styles.chipTextSelected,
+                    selected === day && styles.chipTextSelected,
                   ]}
                 >
                   {day}
@@ -76,18 +84,20 @@ export default function CheckupSheet({
             ))}
           </View>
 
+          {/* Botón confirmar */}
           <Pressable
+            onPress={handleConfirm}
+            disabled={selected === ''}
             style={[
               styles.confirmButton,
-              !selected && styles.confirmButtonDisabled,
+              selected === '' && styles.confirmButtonDisabled,
             ]}
-            onPress={handleConfirm}
-            disabled={!selected}
           >
             <Text style={styles.confirmText}>
               Confirmar
             </Text>
           </Pressable>
+
         </View>
       </View>
     </Modal>
@@ -97,14 +107,21 @@ export default function CheckupSheet({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
+    justifyContent: 'flex-end',
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
 
   backdrop: {
-    flex: 1,
-  },
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+},
 
   sheet: {
+    position: 'relative',
+    zIndex: 1,
     backgroundColor: colors.background,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
@@ -149,14 +166,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  chipSelected: {
+    backgroundColor: colors.dark,
+  },
+
   chipText: {
     fontSize: 14,
     fontWeight: 'bold',
     color: colors.text,
-  },
-
-  chipSelected: {
-    backgroundColor: colors.dark,
   },
 
   chipTextSelected: {
